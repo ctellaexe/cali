@@ -1,37 +1,43 @@
 // storage.ts
 
 import type { Canvas } from "../types/canvas";
+import type { CanvasDocument } from "../types/canvasDocument";
 import { generateId } from "./id";
 
+// ---------------------------------------------
+// CONSTANTS
+// ---------------------------------------------
+
+// Key for storing the array of canvas metadata used by the dashboard
 const STORAGE_KEY = "cali_canvases";
 
+// Prefix for storing the heavy Excalidraw JSON per canvas
+// Example key: "cali_canvas_data_abcd1234"
+const CANVAS_DATA_PREFIX = "cali_canvas_data_";
 
-// Turn whatever is in localStorage into an array of Canvas objects
+// ---------------------------------------------
+// SECTION 1 — METADATA (Dashboard list)
+// ---------------------------------------------
+
+// Load the array of Canvas metadata from localStorage
 export function loadCanvases(): Canvas[] {
-
-    
-  const raw = localStorage.getItem(STORAGE_KEY); // Look in localStorage for the key "cali_canvases"
-
-  if (!raw) return []; // If nothing found --> return []
-
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
 
   try {
-    const list = JSON.parse(raw); // If something found --> try to JSON.parse it
-    return Array.isArray(list) ? list : []; // If parse works and it's an array --> return it
+    const list = JSON.parse(raw);
+    return Array.isArray(list) ? list : [];
   } catch {
-    return []; // If parse fails (corrupted data) --> return []
-
+    return [];
   }
 }
 
-
-// Store the current canvas list in localStorage, this function updates the tempoary "database" we got while testing without DB!
+// Save the metadata list to localStorage
 export function saveCanvases(list: Canvas[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
 
-// Create a valid Canvas object with all required fields.
-// This is what will be displayed in ALL sections of the dashboard
+// Create a new Canvas metadata entry
 export function createCanvasObject(name: string): Canvas {
   return {
     id: generateId(),
@@ -43,8 +49,57 @@ export function createCanvasObject(name: string): Canvas {
   };
 }
 
+// ---------------------------------------------
+// SECTION 2 — CANVAS DOCUMENT (Excalidraw JSON)
+// ---------------------------------------------
 
-export function clearAllCanvases(): void {
-  localStorage.removeItem("cali_canvases");
+// Load the drawing for a canvas (wrapped in CanvasDocument)
+// Returns null if missing or corrupted
+export function loadCanvasData(id: string): CanvasDocument | null {
+  const key = CANVAS_DATA_PREFIX + id;
+  const raw = localStorage.getItem(key);
+
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    // Validate structure of our wrapper
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      typeof parsed.version === "number" &&
+      typeof parsed.lastEdited === "number" &&
+      "data" in parsed
+    ) {
+      return parsed as CanvasDocument;
+    }
+
+    return null; // structure mismatch
+  } catch {
+    return null; // corrupted JSON
+  }
 }
+
+// Save drawing data (CanvasDocument wrapper)
+export function saveCanvasData(id: string, doc: CanvasDocument): void {
+  const key = CANVAS_DATA_PREFIX + id;
+  localStorage.setItem(key, JSON.stringify(doc));
+}
+
+// Delete drawing data for a canvas
+export function deleteCanvasData(id: string): void {
+  const key = CANVAS_DATA_PREFIX + id;
+  localStorage.removeItem(key);
+}
+
+// ---------------------------------------------
+// SECTION 3 — UTILS
+// ---------------------------------------------
+
+// Clear *only metadata*, not drawing JSON
+export function clearAllCanvases(): void {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
 
