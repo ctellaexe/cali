@@ -1,3 +1,5 @@
+// CanvasCard.tsx
+
 import { useNavigate } from "react-router-dom";
 
 type CanvasCardProps = {

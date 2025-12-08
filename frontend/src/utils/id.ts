@@ -1,3 +1,5 @@
+// id.ts
+
 // Simple ID generator for now
 // Later we can replace with nanoid or UUID
 

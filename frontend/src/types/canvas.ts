@@ -1,4 +1,4 @@
-
+// canvas.ts
 export type Canvas = {
   id: string;        // unique id used in URL and storage
   name: string;      // display name for the canvas

@@ -1,3 +1,5 @@
+// App.tsx
+
 import { Routes, Route } from "react-router-dom"; // Routes + Route: decides which page component to show based on the URL
 
 // Full-page components that match URLs ("/", "/canvas/:id")

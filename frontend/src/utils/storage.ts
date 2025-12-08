@@ -1,3 +1,5 @@
+// storage.ts
+
 import type { Canvas } from "../types/canvas";
 import { generateId } from "./id";
 
@@ -21,8 +23,6 @@ export function loadCanvases(): Canvas[] {
 
   }
 }
-
-
 
 
 // Store the current canvas list in localStorage, this function updates the tempoary "database" we got while testing without DB!

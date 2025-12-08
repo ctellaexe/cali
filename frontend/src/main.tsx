@@ -1,3 +1,5 @@
+// main.tsx
+
 // entry point to tell browser to see the <div id="root"></div> in index.html and put the React app in there
 
 import ReactDOM from "react-dom/client"; // lets React take control of a real DOM element in index.html
